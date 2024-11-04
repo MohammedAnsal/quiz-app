@@ -1,32 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { quiz } from "../data";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 type Sans = {
   score: number;
   correctAnswers: number;
   wrongAnswers: number;
+  totalQuestions: number;
 };
 
-const QuizPage = () => {
+const QuizPage: React.FC = () => {
+  const router = useRouter();
+
   const [checked, setChecked] = useState<boolean>(false);
   const [activeQuestion, setActiveQuestion] = useState<number>(0);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(
     null
   );
   const [showResult, setShowResult] = useState<boolean>(false);
+  const { questions, totalQuestions } = quiz;
   const [result, setResult] = useState<Sans>({
     score: 0,
     correctAnswers: 0,
     wrongAnswers: 0,
+    totalQuestions: totalQuestions,
   });
   const [selectedAnswer, setSelectedAnswer] = useState<boolean>(false);
 
-  const { questions, totalQuestions } = quiz;
   const { question, answers, correctAnswer } = questions[activeQuestion];
+
+  useEffect(() => {
+
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    }
+
+  }, []);
 
   //  Manage Answer Is Correct or Not
 
@@ -69,6 +82,12 @@ const QuizPage = () => {
     }
 
     setChecked(false);
+  };
+
+  //  Pass All Result
+
+  const handleAllRes = () => {
+    router.push(`/quiz/shwo-res?data=${JSON.stringify(result)}`);
   };
 
   return (
@@ -148,31 +167,20 @@ const QuizPage = () => {
           )}
 
           {showResult && (
-            <div className=" text-white w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 bg-neutral-50000 p-6 rounded-lg shadow-lg text-center text-neutral-[.3]">
-              <h3 className="text-white">Results</h3>
-
-              <h3 className="text-white">
-                Overall {(result.score / questions.length) * 100}%
+            <div className="text-white w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 p-6 rounded-lg shadow-lg text-center">
+              <h3 className="text-2xl text-white font-semibold mb-4">
+                Results
               </h3>
 
-              <p>
-                Total Questions : <span>{questions.length}</span>
-              </p>
+              <h3 className="text-lg mb-2 text-white">
+                Overall Score: {(result.score / questions.length) * 100}%
+              </h3>
 
-              <p>
-                Total Score : <span>{result.score}</span>
-              </p>
-              <p>
-                Correct Answers : <span>{result.correctAnswers}</span>
-              </p>
-              <p>
-                Wrong Answers : <span>{result.wrongAnswers}</span>
-              </p>
               <button
-                onClick={() => window.location.reload()}
-                className="w-full py-3 rounded-lg font-semibold text-sm transition-all duration-300 ease-in bg-gradient-to-b from-neutral-300 to-neutral-700 text-neutral-900 hover:from-neutral-400 hover:to-neutral-800"
+                onClick={handleAllRes}
+                className="mt-4 w-full py-3 rounded-lg font-semibold text-sm transition-all duration-300 ease-in bg-gradient-to-b from-neutral-300 to-neutral-700 text-neutral-900 hover:from-neutral-400 hover:to-neutral-800"
               >
-                Restart Quiz
+                Show All Results
               </button>
             </div>
           )}
