@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 interface Result {
   score: number;
@@ -12,20 +13,59 @@ interface Result {
   totalQuestions: number;
 }
 
-const AllResult: React.FC = () => {
+// Separate component that uses useSearchParams
+const ResultContent: React.FC = () => {
   const [allData, setAllData] = useState<Result | null>(null);
+  const searchParams = useSearchParams();
 
-  useEffect(() => { 
-    const query = new URLSearchParams(window.location.search);
-    const data = query.get("data");
-
+  useEffect(() => {
+    const data = searchParams.get("data");
     if (data) {
-      setAllData(JSON.parse(data));
+      try {
+        setAllData(JSON.parse(data));
+      } catch (error) {
+        console.error("Invalid result data", error);
+      }
     }
-  }, []);
+  }, [searchParams]);
 
-  if (!allData) return <p>Loading results...</p>;
+  if (!allData) return <p className="text-white">Loading results...</p>;
 
+  return (
+    <div className="mt-10 w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 p-6 rounded-lg shadow-[0px_4px_15px_rgba(0,0,0,0.5)] bg-neutral-800 text-white text-center">
+      <p className="text-lg font-semibold mb-4">Your Results</p>
+
+      <p>
+        Total Questions: <span>{allData.totalQuestions}</span>
+      </p>
+      <p>
+        Total Score: <span>{allData.score}</span>
+      </p>
+      <p>
+        Correct Answers: <span>{allData.correctAnswers}</span>
+      </p>
+      <p>
+        Wrong Answers: <span>{allData.wrongAnswers}</span>
+      </p>
+
+      <Link href={"/quiz"}>
+        <button className="mt-6 w-full py-3 rounded-lg font-semibold bg-gradient-to-b from-neutral-300 to-neutral-700 text-neutral-900 hover:from-neutral-400 hover:to-neutral-800 transition-all duration-300 ease-in">
+          Restart Quiz
+        </button>
+      </Link>
+    </div>
+  );
+};
+
+// Loading component for Suspense fallback
+const LoadingFallback: React.FC = () => (
+  <div className="mt-10 w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 p-6 rounded-lg shadow-[0px_4px_15px_rgba(0,0,0,0.5)] bg-neutral-800 text-white text-center">
+    <p className="text-lg">Loading results...</p>
+  </div>
+);
+
+// Main component
+const AllResult: React.FC = () => {
   return (
     <AuroraBackground>
       <motion.div
@@ -43,26 +83,9 @@ const AllResult: React.FC = () => {
             Quiz Results
           </h1>
 
-          <div className="mt-10 w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 p-6 rounded-lg shadow-[0px_4px_15px_rgba(0,0,0,0.5)] bg-neutral-800 text-white text-center">
-            <p className="text-lg font-semibold mb-4">Your Results</p>
-
-            <p>
-              Total Questions: <span>{allData.totalQuestions}</span>
-            </p>
-            <p>
-              Total Score: <span>{allData.score}</span>
-            </p>
-            <p>
-              Correct Answers: <span>{allData.correctAnswers}</span>
-            </p>
-            <p>
-              Wrong Answers: <span>{allData.wrongAnswers}</span>
-            </p>
-
-            <button className="mt-6 w-full py-3 rounded-lg font-semibold bg-gradient-to-b from-neutral-300 to-neutral-700 text-neutral-900 hover:from-neutral-400 hover:to-neutral-800 transition-all duration-300 ease-in">
-              <Link href={"/quiz"}>Restart Quiz</Link>
-            </button>
-          </div>
+          <Suspense fallback={<LoadingFallback />}>
+            <ResultContent />
+          </Suspense>
         </div>
       </motion.div>
     </AuroraBackground>
