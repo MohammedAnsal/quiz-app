@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+
+        {/* Chatling Config */}
+        <Script id="chatling-config" strategy="afterInteractive">
+          {`
+            window.chtlConfig = {
+              chatbotId: "7974268592"
+            };
+          `}
+        </Script>
+
+        {/* Chatling Script */}
+        <Script
+          id="chtl-script"
+          strategy="afterInteractive"
+          src="https://chatling.ai/js/embed.js"
+          data-id="7974268592"
+        />
+      </body>
     </html>
   );
 }
