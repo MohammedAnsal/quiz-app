@@ -1,11 +1,22 @@
 "use client";
 
-import React, { useStatct,e } from "react";
+import React, { useState } from "react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { fetchQuizQuestions, QuizData, quizCategories, difficultyLevels } from "@/services/api";
-import { fadeIn, staggerContainer, scaleUp, shake, progressBar } from "@/utils/animations";
+import {
+  fetchQuizQuestions,
+  QuizData,
+  quizCategories,
+  difficultyLevels,
+} from "@/services/api";
+import {
+  fadeIn,
+  staggerContainer,
+  scaleUp,
+  shake,
+  progressBar,
+} from "@/utils/animations";
 
 // type Sans = {
 //   score: number;
@@ -27,7 +38,9 @@ const QuizPage: React.FC = () => {
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [checked, setChecked] = useState<boolean>(false);
   const [activeQuestion, setActiveQuestion] = useState<number>(0);
-  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
+  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(
+    null,
+  );
   const [showResult, setShowResult] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<number>(9); // Default: General Knowledge
@@ -46,11 +59,15 @@ const QuizPage: React.FC = () => {
   const loadQuizData = async () => {
     setLoading(true);
     try {
-      const data = await fetchQuizQuestions(questionCount, selectedCategory, selectedDifficulty);
+      const data = await fetchQuizQuestions(
+        questionCount,
+        selectedCategory,
+        selectedDifficulty,
+      );
       setQuizData(data);
-      setResult(prev => ({
+      setResult((prev) => ({
         ...prev,
-        totalQuestions: data.totalQuestions
+        totalQuestions: data.totalQuestions,
       }));
     } catch (error) {
       console.error("Failed to load quiz data:", error);
@@ -71,9 +88,9 @@ const QuizPage: React.FC = () => {
     setSelectedAnswerIndex(index);
 
     if (!quizData) return;
-    
+
     const { correctAnswer } = quizData.questions[activeQuestion];
-    
+
     if (ans === correctAnswer) {
       setSelectedAnswer(true);
     } else {
@@ -97,7 +114,7 @@ const QuizPage: React.FC = () => {
         : {
             ...prev,
             wrongAnswers: (prev?.wrongAnswers ?? 0) + 1,
-          }
+          },
     );
 
     if (!quizData) return;
@@ -118,8 +135,8 @@ const QuizPage: React.FC = () => {
   };
 
   // Calculate progress percentage
-  const progressPercentage = quizData 
-    ? ((activeQuestion + 1) / quizData.totalQuestions) * 100 
+  const progressPercentage = quizData
+    ? ((activeQuestion + 1) / quizData.totalQuestions) * 100
     : 0;
 
   // If in settings mode, show category and difficulty selection
@@ -141,7 +158,7 @@ const QuizPage: React.FC = () => {
               Quiz Settings
             </h1>
 
-            <motion.div 
+            <motion.div
               className="mt-10 w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 p-6 rounded-lg shadow-[0px_4px_15px_rgba(0,0,0,0.5)] bg-neutral-800/50 backdrop-blur-sm"
               variants={scaleUp}
               initial="hidden"
@@ -149,13 +166,17 @@ const QuizPage: React.FC = () => {
             >
               <div className="space-y-6">
                 <div>
-                  <label className="block text-neutral-300 mb-2">Category</label>
-                  <select 
+                  <label className="block text-neutral-300 mb-2">
+                    Category
+                  </label>
+                  <select
                     className="w-full p-3 rounded-lg bg-neutral-700 text-white border border-neutral-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(Number(e.target.value))}
+                    onChange={(e) =>
+                      setSelectedCategory(Number(e.target.value))
+                    }
                   >
-                    {quizCategories.map(category => (
+                    {quizCategories.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
@@ -164,13 +185,15 @@ const QuizPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-neutral-300 mb-2">Difficulty</label>
-                  <select 
+                  <label className="block text-neutral-300 mb-2">
+                    Difficulty
+                  </label>
+                  <select
                     className="w-full p-3 rounded-lg bg-neutral-700 text-white border border-neutral-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     value={selectedDifficulty}
                     onChange={(e) => setSelectedDifficulty(e.target.value)}
                   >
-                    {difficultyLevels.map(level => (
+                    {difficultyLevels.map((level) => (
                       <option key={level} value={level}>
                         {level.charAt(0).toUpperCase() + level.slice(1)}
                       </option>
@@ -179,11 +202,13 @@ const QuizPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-neutral-300 mb-2">Number of Questions</label>
-                  <input 
-                    type="number" 
-                    min="1" 
-                    max="20" 
+                  <label className="block text-neutral-300 mb-2">
+                    Number of Questions
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
                     className="w-full p-3 rounded-lg bg-neutral-700 text-white border border-neutral-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     value={questionCount}
                     onChange={(e) => setQuestionCount(Number(e.target.value))}
@@ -273,10 +298,10 @@ const QuizPage: React.FC = () => {
                 <h2 className="text-xl font-semibold text-white">
                   Question: {activeQuestion + 1}/{quizData.totalQuestions}
                 </h2>
-                
+
                 {/* Progress bar */}
                 <div className="w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 h-2 bg-neutral-700 rounded-full mt-3 mx-auto overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     className="h-full bg-gradient-to-r from-indigo-500 to-purple-600"
                     variants={progressBar(progressPercentage)}
                     initial="initial"
@@ -287,7 +312,7 @@ const QuizPage: React.FC = () => {
 
               <div className="flex justify-center mt-10 w-full">
                 <AnimatePresence mode="wait">
-                  <motion.div 
+                  <motion.div
                     key={activeQuestion}
                     initial={{ opacity: 0, x: 100 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -295,24 +320,38 @@ const QuizPage: React.FC = () => {
                     transition={{ duration: 0.3 }}
                     className="quiz-container w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 p-6 rounded-lg transition-all duration-300 ease-in shadow-[0px_4px_15px_rgba(0,0,0,0.5)] bg-neutral-800/50 backdrop-blur-sm"
                   >
-                    <motion.h3 
+                    <motion.h3
                       className="text-xl text-white font-medium text-center mb-6"
                       dangerouslySetInnerHTML={{ __html: question }}
                     />
 
-                    <motion.ul 
+                    <motion.ul
                       className="space-y-3 text-white"
                       variants={staggerContainer}
                       initial="hidden"
+                      animate="visible"
+                    >
+                      {answers.map((ans, index) => (
                         <motion.li
                           key={index}
-  variants={fadeIn("up", index * 0.1)}  // First variants attribute
-                          onClick={() => !checked && onAnswerSelected(ans, index)}
-                          animate={wrongAnimation && selectedAnswerIndex === index ? "shake" : ""}
-  variants={shake}  // Second variants attribute (duplicate)
-  className={`p-4 rounded-lg border-2 text-center cursor-pointer transition-all duration-300 ease-in ${
-    // ...
-                          } `}
+                          variants={fadeIn("up", index * 0.1)}
+                          onClick={() =>
+                            !checked && onAnswerSelected(ans, index)
+                          }
+                          animate={
+                            wrongAnimation && selectedAnswerIndex === index
+                              ? "shake"
+                              : ""
+                          }
+                          className={`p-4 rounded-lg border-2 text-center cursor-pointer transition-all duration-300 ease-in ${
+                            checked
+                              ? ans === questions[activeQuestion].correctAnswer
+                                ? "border-green-500 bg-green-500/20"
+                                : selectedAnswerIndex === index
+                                  ? "border-red-500 bg-red-500/20"
+                                  : "border-neutral-600"
+                              : "border-neutral-600 hover:border-indigo-500"
+                          }`}
                           whileHover={!checked ? { scale: 1.02 } : {}}
                           whileTap={!checked ? { scale: 0.98 } : {}}
                         >
@@ -351,7 +390,7 @@ const QuizPage: React.FC = () => {
           )}
 
           {showResult && (
-            <motion.div 
+            <motion.div
               className="text-white w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 p-6 rounded-lg shadow-lg text-center bg-neutral-800/50 backdrop-blur-sm"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -368,7 +407,8 @@ const QuizPage: React.FC = () => {
               >
                 <div className="py-3 px-4 bg-neutral-700/50 rounded-lg mb-4">
                   <h3 className="text-lg mb-2 text-white">
-                    Overall Score: {Math.round((result.score / questions.length) * 100)}%
+                    Overall Score:{" "}
+                    {Math.round((result.score / questions.length) * 100)}%
                   </h3>
                 </div>
 
@@ -387,19 +427,6 @@ const QuizPage: React.FC = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Try Another Quiz
-                </motion.button>
-              </motion.div>
-            </motion.div>
-          )}
-        </div>
-      </motion.div>
-    </AuroraBackground>
-  );
-};
-
-export default QuizPage;
-
                   Try Another Quiz
                 </motion.button>
               </motion.div>
