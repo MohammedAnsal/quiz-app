@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+// @ts-ignore: Allow side-effect CSS import in Next.js app directory
 import "./globals.css";
 
 export const metadata: Metadata = {

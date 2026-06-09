@@ -79,7 +79,3 @@ export const quizCategories = [
 ];
 
 export const difficultyLevels = ['easy', 'medium', 'hard'];
-
-];
-
-export const difficultyLevels = ['easy', 'medium', 'hard'];
